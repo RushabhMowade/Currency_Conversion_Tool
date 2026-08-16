@@ -1,0 +1,191 @@
+# 🛠️ Tools
+1. get_conversion_factor
+
+This tool retrieves the current conversion rate between two currencies using ExchangeRate-API.
+
+@tool
+def get_conversion_factor(
+    base_currency: str,
+    target_currency: str
+) -> float:
+    """
+    This function fetches the currency conversion factor
+    between a given base currency and a target currency.
+    """
+
+
+    url = f"https://v6.exchangerate-api.com/v6/YOUR_API_KEY/pair/{base_currency}/{target_currency}"
+
+
+    response = requests.get(url)
+
+
+    return response.json()
+Example
+get_conversion_factor.invoke({
+    "base_currency": "USD",
+    "target_currency": "INR"
+})
+
+Example response:
+
+{
+    "result": "success",
+    "base_code": "USD",
+    "target_code": "INR",
+    "conversion_rate": 95.5035
+}
+2. convert
+
+The convert tool calculates the target currency value using the conversion rate retrieved from the API.
+
+@tool
+def convert(
+    base_currency_value: int,
+    conversion_rate: float
+) -> float:
+    """
+    Given a currency conversion rate, this function calculates
+    the target currency value from a given base currency value.
+    """
+
+
+    return base_currency_value * conversion_rate
+Example
+convert.invoke({
+    "base_currency_value": 10,
+    "conversion_rate": 95.50
+})
+
+Output:
+
+955.0
+🤖 Gemini Integration
+
+The project uses Gemini 2.5 Flash through LangChain.
+
+from langchain_google_genai import ChatGoogleGenerativeAI
+
+
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash",
+    temperature=0
+)
+
+The custom tools are then bound to the Gemini model:
+
+llm_with_tools = llm.bind_tools([
+    get_conversion_factor,
+    convert
+])
+
+This allows Gemini to determine when a tool should be called.
+
+🔗 Tool Calling Workflow
+
+For example, the user can ask:
+
+What is the conversion factor between INR and USD,
+and based on that can you convert 10 INR to USD?
+
+Gemini identifies that it needs the exchange rate first.
+
+Step 1 — Get Exchange Rate
+
+Gemini calls:
+
+get_conversion_factor(
+    base_currency="INR",
+    target_currency="USD"
+)
+
+The API returns the conversion rate.
+
+Example:
+
+INR → USD
+Conversion Rate = 0.01047
+Step 2 — Perform Conversion
+
+Gemini then calls:
+
+convert(
+    base_currency_value=10,
+    conversion_rate=0.01047
+)
+
+The calculation is:
+
+10 × 0.01047 = 0.1047
+Step 3 — Generate Final Response
+
+Gemini receives the tool result and generates the final response:
+
+The conversion factor between INR and USD is 0.01047.
+10 INR is equal to 0.1047 USD.
+📦 Tech Stack
+Technology	Purpose
+Python	Core programming language
+LangChain	LLM and tool integration
+Google Gemini 2.5 Flash	AI reasoning and tool calling
+ExchangeRate-API	Currency exchange-rate data
+Requests	HTTP API requests
+Google Colab	Development environment
+📥 Installation
+
+Install the required dependencies:
+
+pip install -U langchain-google-genai
+
+The project also uses:
+
+import requests
+
+
+from langchain_core.tools import tool
+from langchain_core.messages import HumanMessage
+from langchain_core.messages import ToolMessage
+from langchain_core.tools import InjectedToolArg
+🔑 API Keys
+
+The project requires API credentials for:
+
+Google Gemini
+ExchangeRate-API
+Gemini API Key
+
+Set your Gemini API key using an environment variable:
+
+import os
+from getpass import getpass
+
+
+os.environ["GOOGLE_API_KEY"] = getpass("Gemini key: ")
+ExchangeRate-API Key
+
+The ExchangeRate-API key is used when constructing the API request:
+url = f"https://v6.exchangerate-api.com/v6/YOUR_API_KEY/pair/{base_currency}/{target_currency}"
+
+💻 Example
+User Input
+What is the conversion factor between INR and USD,
+and based on that can you convert 10 INR to USD?
+Gemini Tool Call
+{
+    "name": "get_conversion_factor",
+    "args": {
+        "base_currency": "INR",
+        "target_currency": "USD"
+    }
+}
+ExchangeRate-API Response
+{
+    "base_code": "INR",
+    "target_code": "USD",
+    "conversion_rate": 0.01047
+}
+Conversion Tool
+10 × 0.01047
+Final Output
+The conversion factor between INR and USD is 0.01047.
+10 INR is equal to 0.1047 USD.
