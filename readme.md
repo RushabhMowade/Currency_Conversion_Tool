@@ -67,3 +67,5 @@ The first tool retrieves the exchange rate, while the second performs the actual
                        │
                        ▼
               Gemini Final Answer
+
+
