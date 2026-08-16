@@ -1,4 +1,4 @@
-# 🛠️ Tools
+🛠️ Tools
 1. get_conversion_factor
 
 This tool retrieves the current conversion rate between two currencies using ExchangeRate-API.
